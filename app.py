@@ -1,19 +1,24 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 
 app = Flask(__name__)
-socketIO = SocketIO(app)
+CORS(app)  # Habilitar CORS para toda la aplicación
+socketio = SocketIO(app, cors_allowed_origins="*") 
 
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@socketIO.on('mensaje')
-def handle_mensaje(msg):
-    print(msg)
-    socketIO.emit('mensaje', msg)
+@socketio.on('message')
+def handle_message(msg):
+    print('Message:', msg)
+    socketio.emit('message', msg)
 
-if __name__ == "__main__":
-    socketIO.run(app, debug=True)
+@socketio.on('mensaje')
+def handle_message2(msg):
+    print('Emitiendo:', msg)
+    socketio.emit('mensaje', msg)
 
-
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
